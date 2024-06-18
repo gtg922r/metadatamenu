@@ -6,6 +6,7 @@ import { getValues, getValuesForIndexedPath } from "./commands/getValues";
 import { insertMissingFields } from "./commands/insertMissingFields";
 import { IndexedFieldsPayload, postValues } from "./commands/postValues";
 import { NamedFieldsPayload, postNamedFieldsValues } from "./commands/postNamedFieldsValues";
+import NoteFieldsComponent from "./components/FieldsModal"
 
 export interface IMetadataMenuApi {
     getValues: (fileOrFilePath: TFile | string, attribute: string) => Promise<string[]>;
@@ -16,6 +17,7 @@ export interface IMetadataMenuApi {
     insertMissingFields: (fileOrFilePath: string | TFile, lineNumber: number, asList: boolean, asBlockquote: boolean, fileClassName?: string) => Promise<void>;
     postValues: (fileOrFilePath: TFile | string, payload: IndexedFieldsPayload, lineNumber?: number, asList?: boolean, asBlockquote?: boolean) => Promise<void>;
     postNamedFieldsValues: (fileOrFilePath: TFile | string, payload: NamedFieldsPayload, lineNumber?: number, asList?: boolean, asBlockquote?: boolean) => Promise<void>;
+	openNoteFieldsModal: (file: TFile) => void;
 }
 
 export class MetadataMenuApi {
@@ -31,7 +33,8 @@ export class MetadataMenuApi {
             namedFileFields: this.namedFileFields(),
             insertMissingFields: this.insertMissingFields(),
             postValues: this.postValues(),
-            postNamedFieldsValues: this.postNamedFieldsValues()
+            postNamedFieldsValues: this.postNamedFieldsValues(),
+			openNoteFieldsModal: this.openNoteFieldsModal()
         };
     }
 
@@ -67,5 +70,9 @@ export class MetadataMenuApi {
     private postNamedFieldsValues(): (fileOrFilePath: string | TFile, payload: NamedFieldsPayload, lineNumber?: number, asList?: boolean, asBlockquote?: boolean) => Promise<void> {
         return async (fileOrFilePath: string | TFile, payload: NamedFieldsPayload, lineNumber?: number, asList?: boolean, asBlockquote?: boolean) => postNamedFieldsValues(this.plugin, payload, fileOrFilePath, lineNumber, asList, asBlockquote)
     }
+
+	private openNoteFieldsModal(): (file: TFile) => void {
+		return (file: TFile) => this.plugin.addChild(new NoteFieldsComponent(this.plugin, "1", () => { }, file))
+	}
 
 }
